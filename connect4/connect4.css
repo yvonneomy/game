@@ -1,0 +1,51 @@
+.game-container {
+    text-align: center;
+    padding: 20px;
+}
+
+#board {
+    background: #0066cc;
+    padding: 10px;
+    border-radius: 10px;
+    display: inline-block;
+    margin: 20px auto;
+}
+
+.column {
+    display: inline-block;
+    vertical-align: bottom;
+}
+
+.cell {
+    width: 60px;
+    height: 60px;
+    background: white;
+    border-radius: 50%;
+    margin: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.player1 {
+    background: red;
+}
+
+.player2 {
+    background: yellow;
+}
+
+#reset {
+    font-size: 1.2em;
+    padding: 10px 20px;
+    margin: 20px;
+    cursor: pointer;
+    background: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+}
+
+#status {
+    font-size: 1.5em;
+    margin: 10px;
+}
