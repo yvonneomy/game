@@ -3,10 +3,6 @@ let currentPlayer = 'X';
 let gameBoard = ['', '', '', '', '', '', '', '', ''];
 let gameActive = false;
 
-const winSound = new Audio('https://www.soundjay.com/buttons/sounds/button-09.mp3');
-const clickSound = new Audio('https://www.soundjay.com/buttons/sounds/button-16.mp3');
-const drawSound = new Audio('https://www.soundjay.com/buttons/sounds/button-10.mp3');
-
 const winCombos = [
     [0, 1, 2], [3, 4, 5], [6, 7, 8], // Rows
     [0, 3, 6], [1, 4, 7], [2, 5, 8], // Columns
@@ -22,7 +18,11 @@ function handleCellClick(e, index) {
     const cell = e.target;
     if (cell.textContent || !gameActive) return;
 
-    clickSound.play();
+    // Haptic feedback for mobile
+    if (navigator.vibrate) {
+        navigator.vibrate(50);
+    }
+
     makeMove(index);
 
     if (gameMode === 'computer' && gameActive && currentPlayer === 'O') {
@@ -32,25 +32,26 @@ function handleCellClick(e, index) {
 
 function makeMove(index) {
     gameBoard[index] = currentPlayer;
-    document.querySelectorAll('.cell')[index].textContent = currentPlayer;
-    document.querySelectorAll('.cell')[index].classList.add(currentPlayer.toLowerCase());
+    const cells = document.querySelectorAll('.cell');
+    cells[index].textContent = currentPlayer;
+    cells[index].classList.add(currentPlayer.toLowerCase());
 
     if (checkWin()) {
-        winSound.play();
-        document.getElementById('status').textContent = `Player ${currentPlayer} wins!`;
+        document.getElementById('status').textContent = `Player ${currentPlayer} wins! 🎉`;
         gameActive = false;
+        highlightWinningCells();
         return;
     }
 
     if (checkDraw()) {
-        drawSound.play();
-        document.getElementById('status').textContent = "It's a draw!";
+        document.getElementById('status').textContent = "It's a draw! 🤝";
         gameActive = false;
         return;
     }
 
     currentPlayer = currentPlayer === 'X' ? 'O' : 'X';
-    document.getElementById('status').textContent = `Player ${currentPlayer}'s turn`;
+    const nextPlayerText = gameMode === 'computer' && currentPlayer === 'O' ? 'Computer' : `Player ${currentPlayer}`;
+    document.getElementById('status').textContent = `${nextPlayerText}'s turn`;
 }
 
 function computerMove() {
@@ -60,9 +61,22 @@ function computerMove() {
     }, []);
 
     if (availableMoves.length > 0) {
-        const randomIndex = Math.floor(Math.random() * availableMoves.length);
-        makeMove(availableMoves[randomIndex]);
+        // Simple AI: try to win, then block, then random
+        let moveIndex = findWinningMove('O') || findWinningMove('X') || availableMoves[Math.floor(Math.random() * availableMoves.length)];
+        makeMove(moveIndex);
     }
+}
+
+function findWinningMove(player) {
+    for (let combo of winCombos) {
+        let playerMoves = combo.filter(index => gameBoard[index] === player).length;
+        let emptyMoves = combo.filter(index => gameBoard[index] === '');
+
+        if (playerMoves === 2 && emptyMoves.length === 1) {
+            return combo.find(index => gameBoard[index] === '');
+        }
+    }
+    return null;
 }
 
 function checkWin() {
@@ -71,6 +85,19 @@ function checkWin() {
             return gameBoard[index] === currentPlayer;
         });
     });
+}
+
+function highlightWinningCells() {
+    const winningCombo = winCombos.find(combo => {
+        return combo.every(index => gameBoard[index] === currentPlayer);
+    });
+
+    if (winningCombo) {
+        const cells = document.querySelectorAll('.cell');
+        winningCombo.forEach(index => {
+            cells[index].style.background = currentPlayer === 'X' ? 'rgba(255, 71, 87, 0.3)' : 'rgba(55, 66, 250, 0.3)';
+        });
+    }
 }
 
 function checkDraw() {
@@ -82,10 +109,11 @@ function resetGame() {
     currentPlayer = 'X';
     gameActive = true;
     document.getElementById('status').textContent = "Player X's turn";
-    
+
     document.querySelectorAll('.cell').forEach(cell => {
         cell.textContent = '';
         cell.classList.remove('x', 'o');
+        cell.style.background = '';
     });
 }
 
@@ -98,3 +126,14 @@ document.getElementById('restart').addEventListener('click', resetGame);
 
 // Start the game
 resetGame();
+
+// Prevent zoom on double tap (mobile)
+document.addEventListener('touchend', function (event) {
+    const now = (new Date()).getTime();
+    if (now - lastTouchEnd <= 300) {
+        event.preventDefault();
+    }
+    lastTouchEnd = now;
+}, false);
+
+let lastTouchEnd = 0;

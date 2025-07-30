@@ -1,0 +1,887 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigerian Whot Card Game</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+        }
+
+        .game-container {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 900px;
+            width: 100%;
+        }
+
+        .title {
+            text-align: center;
+            font-size: 2.5em;
+            margin-bottom: 20px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .menu {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .menu button {
+            background: linear-gradient(45deg, #ff6b6b, #ee5a52);
+            border: none;
+            color: white;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            border-radius: 50px;
+            cursor: pointer;
+            margin: 10px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+        }
+
+        .menu button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.3);
+        }
+
+        .game-board {
+            display: none;
+            text-align: center;
+        }
+
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .player-info {
+            font-size: 1.1em;
+            font-weight: bold;
+        }
+
+        .current-player {
+            background: rgba(255, 215, 0, 0.3);
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+
+        .center-area {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px 0;
+            gap: 30px;
+        }
+
+        .deck {
+            width: 100px;
+            height: 140px;
+            background: linear-gradient(45deg, #4CAF50, #45a049);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+
+        .deck:hover {
+            transform: scale(1.05);
+        }
+
+        .discard-pile {
+            width: 100px;
+            height: 140px;
+            border: 2px dashed rgba(255,255,255,0.5);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+
+        .card {
+            width: 80px;
+            height: 110px;
+            background: white;
+            color: black;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+            font-weight: bold;
+            font-size: 0.9em;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 8px 16px rgba(0,0,0,0.3);
+        }
+
+        .card.circle { border-left: 5px solid #ff4757; }
+        .card.triangle { border-left: 5px solid #2ed573; }
+        .card.cross { border-left: 5px solid #1e90ff; }
+        .card.square { border-left: 5px solid #ffa502; }
+        .card.star { border-left: 5px solid #8e44ad; }
+
+        .card.selected {
+            transform: translateY(-15px);
+            box-shadow: 0 12px 24px rgba(255, 215, 0, 0.6);
+            border: 2px solid gold;
+        }
+
+        .hand {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin: 20px 0;
+            min-height: 130px;
+        }
+
+        .opponent-hand {
+            margin-bottom: 20px;
+        }
+
+        .card-back {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+
+        .actions {
+            margin: 20px 0;
+        }
+
+        .actions button {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            border: none;
+            color: white;
+            padding: 12px 25px;
+            font-size: 1em;
+            border-radius: 25px;
+            cursor: pointer;
+            margin: 5px;
+            transition: all 0.3s ease;
+        }
+
+        .actions button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+
+        .actions button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .message {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-size: 1.1em;
+        }
+
+        .shape-selector {
+            display: none;
+            background: rgba(0, 0, 0, 0.8);
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .shape-selector-content {
+            background: white;
+            color: black;
+            padding: 30px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .shape-buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 20px;
+            justify-content: center;
+        }
+
+        .shape-btn {
+            width: 60px;
+            height: 60px;
+            border: 2px solid #333;
+            border-radius: 10px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            transition: transform 0.2s;
+        }
+
+        .shape-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .shape-btn.circle { background: #ff4757; color: white; }
+        .shape-btn.triangle { background: #2ed573; color: white; }
+        .shape-btn.cross { background: #1e90ff; color: white; }
+        .shape-btn.square { background: #ffa502; color: white; }
+        .shape-btn.star { background: #8e44ad; color: white; }
+
+        @media (max-width: 768px) {
+            .game-container {
+                margin: 10px;
+                padding: 20px;
+            }
+            
+            .card {
+                width: 60px;
+                height: 85px;
+                font-size: 0.8em;
+                margin: 2px;
+            }
+            
+            .center-area {
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="game-container">
+        <h1 class="title">🎮 Nigerian Whot</h1>
+        
+        <div class="menu" id="menu">
+            <button onclick="startGame('computer')">🤖 Play vs Computer</button>
+            <button onclick="startGame('pvp')">👥 Player vs Player</button>
+            <button onclick="showRules()">📋 How to Play</button>
+        </div>
+
+        <div class="game-board" id="gameBoard">
+            <div class="game-info">
+                <div class="player-info">
+                    <span id="player1Name">Player 1</span>: <span id="player1Cards">5</span> cards
+                </div>
+                <div class="current-player" id="currentTurn">Player 1's Turn</div>
+                <div class="player-info">
+                    <span id="player2Name">Player 2</span>: <span id="player2Cards">5</span> cards
+                </div>
+            </div>
+
+            <div class="opponent-hand" id="opponentHand"></div>
+
+            <div class="center-area">
+                <div class="deck" onclick="drawCard()" id="deck">
+                    <div>Draw<br>Card</div>
+                </div>
+                <div class="discard-pile" id="discardPile">
+                    <div id="topCard"></div>
+                </div>
+            </div>
+
+            <div class="hand" id="playerHand"></div>
+
+            <div class="actions">
+                <button onclick="playSelectedCard()" id="playBtn" disabled>Play Card</button>
+                <button onclick="passturn()" id="passBtn">Pass Turn</button>
+                <button onclick="backToMenu()">Back to Menu</button>
+            </div>
+
+            <div class="message" id="message">Select a card to play or draw from deck</div>
+        </div>
+
+        <div class="shape-selector" id="shapeSelector">
+            <div class="shape-selector-content">
+                <h3>Choose a shape for WHOT card:</h3>
+                <div class="shape-buttons">
+                    <div class="shape-btn circle" onclick="selectShape('circle')">●</div>
+                    <div class="shape-btn triangle" onclick="selectShape('triangle')">▲</div>
+                    <div class="shape-btn cross" onclick="selectShape('cross')">✚</div>
+                    <div class="shape-btn square" onclick="selectShape('square')">■</div>
+                    <div class="shape-btn star" onclick="selectShape('star')">★</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let gameMode = '';
+        let currentPlayer = 1;
+        let selectedCard = null;
+        let gameState = {
+            player1Hand: [],
+            player2Hand: [],
+            deck: [],
+            discardPile: [],
+            topCard: null,
+            currentShape: null
+        };
+
+        const shapes = ['circle', 'triangle', 'cross', 'square', 'star'];
+        // Authentic Nigerian Whot card distribution per suit
+        const cardDistribution = {
+            circle: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14],
+            triangle: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14], 
+            cross: [1, 2, 3, 5, 7, 10, 11, 13, 14],
+            square: [1, 2, 3, 5, 7, 10, 11, 13, 14],
+            star: [1, 2, 3, 4, 5, 7, 8]
+        };
+        
+        let pickTwoStack = 0;
+        let pickThreeStack = 0;
+        let lastCardPlayedWasSpecial = false;
+
+        function createDeck() {
+            const deck = [];
+            
+            // Create cards based on authentic distribution
+            Object.keys(cardDistribution).forEach(shape => {
+                cardDistribution[shape].forEach(number => {
+                    deck.push({ shape, number, type: 'regular' });
+                });
+            });
+            
+            // Special WHOT cards (5 cards numbered 20)
+            for (let i = 0; i < 5; i++) {
+                deck.push({ shape: 'whot', number: 20, type: 'special' });
+            }
+            
+            return shuffleDeck(deck);
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+            return deck;
+        }
+
+        function startGame(mode) {
+            gameMode = mode;
+            document.getElementById('menu').style.display = 'none';
+            document.getElementById('gameBoard').style.display = 'block';
+            
+            if (mode === 'computer') {
+                document.getElementById('player2Name').textContent = 'Computer';
+            } else {
+                document.getElementById('player2Name').textContent = 'Player 2';
+            }
+            
+            initializeGame();
+        }
+
+        function initializeGame() {
+            gameState.deck = createDeck();
+            gameState.player1Hand = [];
+            gameState.player2Hand = [];
+            gameState.discardPile = [];
+            currentPlayer = 1;
+            selectedCard = null;
+            pickTwoStack = 0;
+            pickThreeStack = 0;
+            lastCardPlayedWasSpecial = false;
+            
+            // Deal 5 cards to each player
+            for (let i = 0; i < 5; i++) {
+                gameState.player1Hand.push(gameState.deck.pop());
+                gameState.player2Hand.push(gameState.deck.pop());
+            }
+            
+            // Set first card on discard pile
+            let firstCard = gameState.deck.pop();
+            while (firstCard.type === 'special') {
+                gameState.deck.unshift(firstCard);
+                gameState.deck = shuffleDeck(gameState.deck);
+                firstCard = gameState.deck.pop();
+            }
+            
+            gameState.discardPile.push(firstCard);
+            gameState.topCard = firstCard;
+            gameState.currentShape = firstCard.shape;
+            
+            updateDisplay();
+            updateMessage("Game started! Player 1's turn.");
+        }
+
+        function updateDisplay() {
+            updateHands();
+            updateTopCard();
+            updateGameInfo();
+            updateTurnIndicator();
+        }
+
+        function updateHands() {
+            const playerHand = document.getElementById('playerHand');
+            const opponentHand = document.getElementById('opponentHand');
+            
+            playerHand.innerHTML = '';
+            opponentHand.innerHTML = '';
+            
+            // Player 1 hand (always visible)
+            gameState.player1Hand.forEach((card, index) => {
+                const cardElement = createCardElement(card, index, true);
+                playerHand.appendChild(cardElement);
+            });
+            
+            // Player 2 hand (face down in computer mode, face up in PvP)
+            gameState.player2Hand.forEach((card, index) => {
+                const cardElement = createCardElement(card, index, gameMode === 'pvp' && currentPlayer === 2);
+                if (gameMode === 'computer' || (gameMode === 'pvp' && currentPlayer !== 2)) {
+                    cardElement.classList.add('card-back');
+                    cardElement.innerHTML = '<div>WHOT</div>';
+                }
+                opponentHand.appendChild(cardElement);
+            });
+        }
+
+        function createCardElement(card, index, clickable) {
+            const cardElement = document.createElement('div');
+            cardElement.className = `card ${card.shape}`;
+            
+            let displayNumber = card.number;
+            if (card.number === 20) displayNumber = 'WHOT';
+            
+            cardElement.innerHTML = `<div>${displayNumber}</div><div>${getShapeSymbol(card.shape)}</div>`;
+            
+            if (clickable) {
+                cardElement.onclick = () => selectCard(index);
+            }
+            
+            return cardElement;
+        }
+
+        function getShapeSymbol(shape) {
+            const symbols = {
+                circle: '●',
+                triangle: '▲',
+                cross: '✚',
+                square: '■',
+                star: '★',
+                whot: 'WHOT'
+            };
+            return symbols[shape] || shape;
+        }
+
+        function updateTopCard() {
+            const topCardElement = document.getElementById('topCard');
+            if (gameState.topCard) {
+                topCardElement.innerHTML = '';
+                const cardElement = createCardElement(gameState.topCard, -1, false);
+                topCardElement.appendChild(cardElement);
+            }
+        }
+
+        function updateGameInfo() {
+            document.getElementById('player1Cards').textContent = gameState.player1Hand.length;
+            document.getElementById('player2Cards').textContent = gameState.player2Hand.length;
+        }
+
+        function updateTurnIndicator() {
+            const turnElement = document.getElementById('currentTurn');
+            if (currentPlayer === 1) {
+                turnElement.textContent = "Player 1's Turn";
+            } else {
+                turnElement.textContent = gameMode === 'computer' ? "Computer's Turn" : "Player 2's Turn";
+            }
+        }
+
+        function selectCard(index) {
+            if ((currentPlayer === 1 && gameMode === 'pvp') || (currentPlayer === 1 && gameMode === 'computer')) {
+                // Clear previous selection
+                document.querySelectorAll('.card.selected').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                selectedCard = index;
+                const cards = document.getElementById('playerHand').children;
+                if (cards[index]) {
+                    cards[index].classList.add('selected');
+                }
+                
+                document.getElementById('playBtn').disabled = false;
+                updateMessage("Card selected. Click 'Play Card' to play it.");
+            } else if (currentPlayer === 2 && gameMode === 'pvp') {
+                // Clear previous selection
+                document.querySelectorAll('.card.selected').forEach(card => {
+                    card.classList.remove('selected');
+                });
+                
+                selectedCard = index;
+                const cards = document.getElementById('opponentHand').children;
+                if (cards[index]) {
+                    cards[index].classList.add('selected');
+                }
+                
+                document.getElementById('playBtn').disabled = false;
+                updateMessage("Card selected. Click 'Play Card' to play it.");
+            }
+        }
+
+        function canPlayCard(card) {
+            // Handle stacked pick two/three - must defend with same special card
+            if (pickTwoStack > 0 && card.number !== 2) return false;
+            if (pickThreeStack > 0 && card.number !== 5) return false;
+            
+            // WHOT cards can always be played
+            if (card.type === 'special') return true;
+            
+            // Regular matching rules
+            return card.shape === gameState.currentShape || card.number === gameState.topCard.number;
+        }
+
+        function getSpecialCardEffect(card) {
+            const effects = {
+                1: 'Pick One',
+                2: 'Pick 2', 
+                5: 'Pick 3',
+                8: 'Suspension',
+                14: 'General Market',
+                20: 'WHOT'
+            };
+            return effects[card.number] || null;
+        }
+
+        function executeSpecialEffect(card) {
+            const effect = getSpecialCardEffect(card);
+            
+            switch(card.number) {
+                case 1: // Pick One
+                    return { type: 'pick', count: 1, target: 'next' };
+                case 2: // Pick Two
+                    pickTwoStack += 2;
+                    return { type: 'pick', count: pickTwoStack, target: 'next', stackable: true };
+                case 5: // Pick Three  
+                    pickThreeStack += 3;
+                    return { type: 'pick', count: pickThreeStack, target: 'next', stackable: true };
+                case 8: // Suspension
+                    return { type: 'suspension', target: 'next' };
+                case 14: // General Market
+                    return { type: 'general_market', count: 1, target: 'all_except_current' };
+                case 20: // WHOT
+                    return { type: 'whot' };
+                default:
+                    return null;
+            }
+        }
+
+        function playSelectedCard() {
+            if (selectedCard === null) return;
+            
+            const hand = currentPlayer === 1 ? gameState.player1Hand : gameState.player2Hand;
+            const card = hand[selectedCard];
+            
+            if (!canPlayCard(card)) {
+                let reason = "Cannot play this card! Must match shape or number.";
+                if (pickTwoStack > 0) reason = "Must defend with Pick 2 card!";
+                if (pickThreeStack > 0) reason = "Must defend with Pick 3 card!";
+                updateMessage(reason);
+                return;
+            }
+            
+            // Remove card from hand and add to discard pile
+            hand.splice(selectedCard, 1);
+            gameState.discardPile.push(card);
+            gameState.topCard = card;
+            
+            // Check for instant win (last card played)
+            if (hand.length === 0) {
+                const winner = currentPlayer === 1 ? 'Player 1' : (gameMode === 'computer' ? 'Computer' : 'Player 2');
+                updateMessage(`🎉 ${winner} wins! Last card played!`);
+                return;
+            }
+            
+            // Handle special effects
+            const effect = executeSpecialEffect(card);
+            if (effect) {
+                handleSpecialEffect(effect, card);
+                lastCardPlayedWasSpecial = true;
+            } else {
+                gameState.currentShape = card.shape;
+                lastCardPlayedWasSpecial = false;
+                finishTurn();
+            }
+        }
+
+        function handleSpecialEffect(effect, card) {
+            switch(effect.type) {
+                case 'pick':
+                    if (effect.stackable) {
+                        // For stackable cards (Pick 2, Pick 3), wait for next player's response
+                        updateMessage(`${getSpecialCardEffect(card)} played! Next player must defend or pick ${effect.count} cards.`);
+                        gameState.currentShape = card.shape;
+                        finishTurn();
+                    } else {
+                        // Pick One - immediate effect
+                        const targetHand = currentPlayer === 1 ? gameState.player2Hand : gameState.player1Hand;
+                        drawCardsToHand(targetHand, effect.count);
+                        updateMessage(`Pick One! Opponent draws 1 card.`);
+                        gameState.currentShape = card.shape;
+                        finishTurn();
+                    }
+                    break;
+                    
+                case 'suspension':
+                    updateMessage(`Suspension! Next player loses their turn.`);
+                    gameState.currentShape = card.shape;
+                    // Skip next player
+                    currentPlayer = currentPlayer === 1 ? 2 : 1; // Will be switched again in finishTurn
+                    finishTurn();
+                    break;
+                    
+                case 'general_market':
+                    // All other players draw 1 card
+                    const otherHand = currentPlayer === 1 ? gameState.player2Hand : gameState.player1Hand;
+                    drawCardsToHand(otherHand, 1);
+                    updateMessage(`General Market! All other players draw 1 card.`);
+                    gameState.currentShape = card.shape;
+                    finishTurn();
+                    break;
+                    
+                case 'whot':
+                    // Show shape selector
+                    document.getElementById('shapeSelector').style.display = 'flex';
+                    break;
+            }
+        }
+
+        function drawCardsToHand(hand, count) {
+            for (let i = 0; i < count && gameState.deck.length > 0; i++) {
+                hand.push(gameState.deck.pop());
+            }
+        }
+
+        function selectShape(shape) {
+            gameState.currentShape = shape;
+            document.getElementById('shapeSelector').style.display = 'none';
+            finishTurn();
+        }
+
+        function finishTurn() {
+            selectedCard = null;
+            document.getElementById('playBtn').disabled = true;
+            
+            // Check for win condition
+            const hand = currentPlayer === 1 ? gameState.player1Hand : gameState.player2Hand;
+            if (hand.length === 0) {
+                const winner = currentPlayer === 1 ? 'Player 1' : (gameMode === 'computer' ? 'Computer' : 'Player 2');
+                updateMessage(`🎉 ${winner} wins!`);
+                return;
+            }
+            
+            // Switch turns
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            
+            // Check if new player must draw cards due to undefended Pick 2/3
+            if (pickTwoStack > 0) {
+                const newHand = currentPlayer === 1 ? gameState.player1Hand : gameState.player2Hand;
+                drawCardsToHand(newHand, pickTwoStack);
+                updateMessage(`Drew ${pickTwoStack} cards due to undefended Pick 2!`);
+                pickTwoStack = 0;
+                // Switch turn again since they picked cards
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+            } else if (pickThreeStack > 0) {
+                const newHand = currentPlayer === 1 ? gameState.player1Hand : gameState.player2Hand;
+                drawCardsToHand(newHand, pickThreeStack);
+                updateMessage(`Drew ${pickThreeStack} cards due to undefended Pick 3!`);
+                pickThreeStack = 0;
+                // Switch turn again since they picked cards
+                currentPlayer = currentPlayer === 1 ? 2 : 1;
+            }
+            
+            updateDisplay();
+            
+            if (currentPlayer === 2 && gameMode === 'computer') {
+                setTimeout(computerTurn, 1000);
+            } else {
+                updateMessage(`${currentPlayer === 1 ? 'Player 1' : 'Player 2'}'s turn. Select a card to play.`);
+            }
+        }
+
+        function computerTurn() {
+            const computerHand = gameState.player2Hand;
+            
+            // Check if computer must draw due to stacked pick cards
+            if (pickTwoStack > 0 || pickThreeStack > 0) {
+                const defendCards = computerHand.filter(card => 
+                    (pickTwoStack > 0 && card.number === 2) || 
+                    (pickThreeStack > 0 && card.number === 5)
+                );
+                
+                if (defendCards.length > 0) {
+                    // Computer can defend
+                    const cardToPlay = defendCards[0];
+                    const cardIndex = computerHand.indexOf(cardToPlay);
+                    
+                    computerHand.splice(cardIndex, 1);
+                    gameState.discardPile.push(cardToPlay);
+                    gameState.topCard = cardToPlay;
+                    
+                    if (cardToPlay.number === 2) {
+                        pickTwoStack += 2;
+                        updateMessage(`Computer defended with Pick 2! Stack now ${pickTwoStack} cards.`);
+                    } else if (cardToPlay.number === 5) {
+                        pickThreeStack += 3;
+                        updateMessage(`Computer defended with Pick 3! Stack now ${pickThreeStack} cards.`);
+                    }
+                    
+                    gameState.currentShape = cardToPlay.shape;
+                    
+                    // Check if computer won
+                    if (computerHand.length === 0) {
+                        updateMessage(`🎉 Computer wins!`);
+                        return;
+                    }
+                    
+                    finishTurn();
+                    return;
+                }
+            }
+            
+            const playableCards = computerHand.filter(canPlayCard);
+            
+            if (playableCards.length > 0) {
+                // Prioritize special cards
+                let cardToPlay = playableCards.find(card => getSpecialCardEffect(card)) || playableCards[0];
+                const cardIndex = computerHand.indexOf(cardToPlay);
+                
+                computerHand.splice(cardIndex, 1);
+                gameState.discardPile.push(cardToPlay);
+                gameState.topCard = cardToPlay;
+                
+                // Check if computer won
+                if (computerHand.length === 0) {
+                    updateMessage(`🎉 Computer wins! Last card played!`);
+                    return;
+                }
+                
+                const effect = executeSpecialEffect(cardToPlay);
+                if (effect) {
+                    if (effect.type === 'whot') {
+                        // Computer chooses random shape for WHOT
+                        gameState.currentShape = shapes[Math.floor(Math.random() * shapes.length)];
+                        updateMessage(`Computer played WHOT and chose ${gameState.currentShape}!`);
+                        finishTurn();
+                    } else {
+                        handleSpecialEffect(effect, cardToPlay);
+                    }
+                } else {
+                    gameState.currentShape = cardToPlay.shape;
+                    updateMessage(`Computer played ${cardToPlay.number} ${getShapeSymbol(cardToPlay.shape)}`);
+                    finishTurn();
+                }
+            } else {
+                // Computer draws a card
+                if (gameState.deck.length > 0) {
+                    computerHand.push(gameState.deck.pop());
+                    updateMessage("Computer drew a card.");
+                }
+                
+                currentPlayer = 1;
+                updateDisplay();
+                updateMessage("Your turn! Select a card to play.");
+            }
+        }
+
+        function drawCard() {
+            if (gameState.deck.length === 0) {
+                updateMessage("No more cards in deck!");
+                return;
+            }
+            
+            const hand = currentPlayer === 1 ? gameState.player1Hand : gameState.player2Hand;
+            hand.push(gameState.deck.pop());
+            
+            updateDisplay();
+            updateMessage("Card drawn. You can play it if it matches, or pass your turn.");
+        }
+
+        function passPass() {
+            selectedCard = null;
+            document.getElementById('playBtn').disabled = true;
+            
+            currentPlayer = currentPlayer === 1 ? 2 : 1;
+            updateDisplay();
+            
+            if (currentPlayer === 2 && gameMode === 'computer') {
+                setTimeout(computerTurn, 1000);
+            } else {
+                updateMessage(`${currentPlayer === 1 ? 'Player 1' : 'Player 2'}'s turn.`);
+            }
+        }
+
+        function updateMessage(msg) {
+            document.getElementById('message').textContent = msg;
+        }
+
+        function backToMenu() {
+            document.getElementById('menu').style.display = 'block';
+            document.getElementById('gameBoard').style.display = 'none';
+            document.getElementById('shapeSelector').style.display = 'none';
+        }
+
+        function showRules() {
+            alert(`🎮 Nigerian Whot Rules:
+
+SETUP:
+- 54 cards: 5 shapes (Circle, Triangle, Cross, Square, Star)
+- Each player starts with 5 cards
+- Match top card by shape or number
+
+SPECIAL CARDS:
+🔴 1: Pick One - Next player draws 1 card
+🔴 2: Pick Two - Next player draws 2 cards (stackable) 
+🔴 5: Pick Three - Next player draws 3 cards (stackable)
+🔴 8: Suspension - Next player loses their turn
+🔴 14: General Market - All other players draw 1 card
+🔴 20: WHOT - Play anytime, choose new shape
+
+STACKING RULES:
+- Pick 2 cards stack on Pick 2 cards
+- Pick 3 cards stack on Pick 3 cards  
+- Must defend with same type or draw all stacked cards
+
+WIN CONDITION:
+- First player to play their last card wins immediately!
+- No matter what the last card is
+
+Have fun! 🎉`);
+        }
+    </script>
+</body>
+</html>

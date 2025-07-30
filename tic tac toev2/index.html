@@ -1,6 +1,8 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Tic Tac Toe</title>
     <link rel="stylesheet" href="style.css">
 </head>
@@ -8,8 +10,8 @@
     <div class="container">
         <h1>Tic Tac Toe</h1>
         <div class="game-mode">
-            <button onclick="setGameMode('computer')">Play vs Computer</button>
-            <button onclick="setGameMode('player')">Play vs Player</button>
+            <button class="mode-btn" onclick="setGameMode('computer')">vs Computer</button>
+            <button class="mode-btn" onclick="setGameMode('player')">vs Player</button>
         </div>
         <div class="board" id="board">
             <div class="cell" data-cell></div>
@@ -23,7 +25,7 @@
             <div class="cell" data-cell></div>
         </div>
         <div id="status"></div>
-        <button id="restart">Restart Game</button>
+        <button class="restart-btn" id="restart">Restart Game</button>
     </div>
     <script src="script.js"></script>
 </body>

@@ -1,6 +1,8 @@
 .game-container {
     text-align: center;
     padding: 20px;
+    max-width: 100%;
+    margin: 0 auto;
 }
 
 #board {
@@ -9,6 +11,8 @@
     border-radius: 10px;
     display: inline-block;
     margin: 20px auto;
+    max-width: 100%;
+    box-sizing: border-box;
 }
 
 .column {
@@ -17,11 +21,11 @@
 }
 
 .cell {
-    width: 60px;
-    height: 60px;
+    width: clamp(30px, 8vw, 60px);
+    height: clamp(30px, 8vw, 60px);
     background: white;
     border-radius: 50%;
-    margin: 5px;
+    margin: 3px;
     cursor: pointer;
     transition: background-color 0.3s;
 }
@@ -35,7 +39,7 @@
 }
 
 #reset {
-    font-size: 1.2em;
+    font-size: clamp(1rem, 4vw, 1.2rem);
     padding: 10px 20px;
     margin: 20px;
     cursor: pointer;
@@ -43,9 +47,34 @@
     color: white;
     border: none;
     border-radius: 5px;
+    max-width: 100%;
 }
 
 #status {
-    font-size: 1.5em;
+    font-size: clamp(1.2rem, 4vw, 1.5rem);
     margin: 10px;
+}
+
+h1 {
+    font-size: clamp(1.5rem, 6vw, 2.5rem);
+}
+
+@media (max-width: 480px) {
+    .game-container {
+        padding: 10px;
+    }
+
+    #board {
+        margin: 10px auto;
+        padding: 5px;
+    }
+
+    .cell {
+        margin: 2px;
+    }
+
+    #reset {
+        padding: 8px 16px;
+        margin: 10px;
+    }
 }

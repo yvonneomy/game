@@ -12,6 +12,7 @@ const winningCombinations = [
 ];
 
 function handleCellClick(e) {
+    e.preventDefault(); // Prevent double tap zoom on mobile
     const cell = e.target;
     const index = Array.from(cells).indexOf(cell);
 
@@ -62,6 +63,7 @@ function restartGame() {
 
 cells.forEach(cell => {
     cell.addEventListener('click', handleCellClick);
+    cell.addEventListener('touchstart', handleCellClick, { passive: false });
 });
 
 restartButton.addEventListener('click', restartGame);

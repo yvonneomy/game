@@ -47,6 +47,7 @@ function whack(e) {
     if (!e.isTrusted) return;
     if (!this.parentNode.classList.contains('up')) return;
     
+    e.preventDefault(); // Prevent double-tap zoom on mobile
     score++;
     scoreDisplay.textContent = score;
     this.parentNode.classList.remove('up');
@@ -54,5 +55,12 @@ function whack(e) {
     setTimeout(() => this.classList.remove('hit'), 300);
 }
 
+function addMobileSupport() {
+    moles.forEach(mole => {
+        mole.addEventListener('touchstart', whack, { passive: false });
+    });
+}
+
 moles.forEach(mole => mole.addEventListener('click', whack));
+addMobileSupport();
 startButton.addEventListener('click', startGame);

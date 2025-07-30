@@ -1,31 +1,36 @@
 .container {
     text-align: center;
-    max-width: 400px;
+    max-width: 100%;
     margin: 0 auto;
+    padding: 10px;
     font-family: Arial, sans-serif;
 }
 
 .board {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 10px;
-    margin: 20px 0;
+    gap: 2vmin;
+    margin: 20px auto;
     background: #81C784;
-    padding: 10px;
+    padding: 2vmin;
     border-radius: 10px;
+    width: min(90vmin, 90%);
 }
 
 .cell {
     background: #fff;
     border: 2px solid #4CAF50;
-    height: 100px;
-    font-size: 60px;
+    aspect-ratio: 1;
+    height: auto;
+    font-size: min(20vmin, 60px);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
     color: #2196F3;
     transition: background-color 0.3s;
+    -webkit-tap-highlight-color: transparent;
+    user-select: none;
 }
 
 .cell:hover {
@@ -49,4 +54,25 @@ button {
     padding: 10px 20px;
     font-size: 1.1em;
     cursor: pointer;
+}
+
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.5rem;
+    }
+
+    #status {
+        font-size: 1rem;
+    }
+
+    button {
+        padding: 8px 16px;
+        font-size: 1rem;
+    }
+
+    .board {
+        width: 95%;
+        gap: 1.5vmin;
+        padding: 1.5vmin;
+    }
 }
